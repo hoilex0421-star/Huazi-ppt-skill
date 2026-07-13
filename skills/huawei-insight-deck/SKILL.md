@@ -50,8 +50,8 @@ deck this skill was modeled on and maps each archetype to its helpers.
 
 ## Family A — 市场/洞察论点页 (the 5 structural parts)
 
-Every page is the same five parts, top to bottom. `example_market_page.py` is a
-complete worked example.
+Every page is the same five parts, top to bottom.
+`scripts/example_market_page.py` is a complete worked example.
 
 1. **论点型标题 (`title_band`)** — a *claim* with a **quantified payload** in the
    title itself. Red key clause + black remainder.
@@ -70,8 +70,9 @@ complete worked example.
 ## Family B — 技术研究叙事页 (claim title → archetype → 结论 band)
 
 Same red `title_band` on top and a `conclusion_band` (the red 结论 line) on the
-bottom. The middle is ONE of these archetypes — see `example_narrative_page.py`
-(slide 1 = timeline, slide 2 = framework + table):
+bottom. The middle is ONE of these archetypes — see
+`scripts/example_narrative_page.py` (slide 1 = timeline, slide 2 = framework +
+table):
 
 1. **时间线页 (`time_axis` + `event_card` + `tag_chip`/`legend`)** — a central
    `time_axis` (returns tick x-centers); `event_card`s above (学术界) and below

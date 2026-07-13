@@ -37,7 +37,8 @@ For embodied AI example:
 - Direction one: generalist embodied foundation model.
 - Direction two: world model as co-trainer/simulator/reward or WAM-style action generator.
 
-Use `$huawei-insight-deck` `dashed_panel`, `route_node`, and `arrow` for the three-panel route map.
+Use `$huawei-insight-deck` `section_header`, `stage_box`, and `arrow` for the
+three-panel route map.
 
 ### 3. Route Comparison
 
@@ -74,7 +75,9 @@ Four judgement dimensions:
 - 结构化: observation/action/result/takeover records become trainable data.
 - 商业化: delivery and data collection share the same cost base.
 
-Use `$huawei-insight-deck` `image_case_card` for company examples.
+For several company examples, use `$huawei-insight-deck` `card` with identical
+row labels so the cases remain comparable. For one featured case, use
+`section_header`, `image_ph`, and `spec_table`.
 
 ### 5. Trend Judgement
 

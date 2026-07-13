@@ -521,39 +521,28 @@ Inspect both README files in a Markdown-capable viewer or GitHub preview and con
 
 Expected: no broken link, broken table, missing image, or visibly abbreviated language version.
 
-### Task 6: Rename The GitHub Repository And Publish
+### Task 6: Publish The Renamed GitHub Repository
 
 **Files:**
-- Remote repository: `hoilex0421-star/Huazi-ppt-skill`
-- New remote repository: `hoilex0421-star/lex-ai-research-skills`
+- Remote repository: `hoilex0421-star/lex-ai-research-skills`
 
-- [ ] **Step 1: Confirm authentication and current remote**
+- [ ] **Step 1: Confirm authentication and renamed repository state**
 
 Run:
 
 ```bash
 gh auth status
 git remote -v
-gh repo view hoilex0421-star/Huazi-ppt-skill --json name,url,defaultBranchRef
+gh repo view hoilex0421-star/lex-ai-research-skills --json name,url,defaultBranchRef
 ```
 
 Expected:
 
 - GitHub CLI is authenticated as `hoilex0421-star`.
-- `origin` points to `Huazi-ppt-skill`.
+- The repository name and URL are `lex-ai-research-skills`.
 - The default branch is `main`.
 
-- [ ] **Step 2: Rename the repository**
-
-Run:
-
-```bash
-gh repo rename -R hoilex0421-star/Huazi-ppt-skill lex-ai-research-skills --yes
-```
-
-Expected: GitHub reports a successful rename.
-
-- [ ] **Step 3: Update the local canonical remote**
+- [ ] **Step 2: Ensure the canonical remote uses the renamed URL**
 
 Run:
 
@@ -564,36 +553,37 @@ git remote -v
 
 Expected: both fetch and push URLs use `lex-ai-research-skills.git`.
 
-- [ ] **Step 4: Fast-forward the completed feature branch into local `main`**
+- [ ] **Step 3: Fast-forward the completed feature branch in the main worktree**
 
 Run:
 
 ```bash
-git status --short
-git switch main
-git merge --ff-only feat/skill-library-readme
+MAIN_ROOT="$(git worktree list --porcelain | awk '/^worktree / {sub(/^worktree /, ""); print; exit}')"
+test "$(git -C "$MAIN_ROOT" branch --show-current)" = "main"
+test -z "$(git -C "$MAIN_ROOT" status --short)"
+git -C "$MAIN_ROOT" merge --ff-only feat/skill-library-readme
 ```
 
-Expected: the worktree is clean before switching, and local `main` fast-forwards to the reviewed feature branch without a merge commit.
+Expected: the main worktree is clean and local `main` fast-forwards to the reviewed feature branch without a merge commit.
 
-- [ ] **Step 5: Push the updated default branch**
+- [ ] **Step 4: Push the updated default branch**
 
 Run:
 
 ```bash
-git push -u origin main
+git -C "$MAIN_ROOT" push -u origin main
 ```
 
 Expected: the local `main` branch is synchronized with `origin/main`.
 
-- [ ] **Step 6: Verify the renamed repository**
+- [ ] **Step 5: Verify the renamed repository**
 
 Run:
 
 ```bash
 gh repo view hoilex0421-star/lex-ai-research-skills --json name,url,description,defaultBranchRef
-git status --short
-git log -6 --oneline --decorate
+git -C "$MAIN_ROOT" status --short
+git -C "$MAIN_ROOT" log -6 --oneline --decorate
 ```
 
 Expected:
@@ -604,7 +594,7 @@ Expected:
 - Git status is clean.
 - Recent commits include the design spec, structure migration, gallery, and both README commits.
 
-- [ ] **Step 7: Verify a fresh clone**
+- [ ] **Step 6: Verify a fresh clone**
 
 Run:
 
