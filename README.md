@@ -57,24 +57,30 @@ For an end-to-end assignment, start with `$tech-research-deck` to establish the 
 
 ## Installation
 
-### Symlink installation
-
-Symlinks keep the installed skills connected to the cloned repository, so repository updates are immediately available in Codex.
+### Common setup
 
 ```bash
 git clone https://github.com/hoilex0421-star/lex-ai-research-skills.git
 cd lex-ai-research-skills
 mkdir -p ~/.codex/skills
+```
+
+After completing the common setup, choose one of the following installation options.
+
+### Option A: Symlinks
+
+Symlinks keep the installed skills connected to the cloned repository, so repository updates are immediately available in Codex.
+
+```bash
 ln -s "$PWD/skills/huawei-insight-deck" ~/.codex/skills/huawei-insight-deck
 ln -s "$PWD/skills/tech-research-deck" ~/.codex/skills/tech-research-deck
 ```
 
-### Direct copy
+### Option B: Direct copies
 
 Use direct copies when the installed skills should remain independent of the cloned repository.
 
 ```bash
-mkdir -p ~/.codex/skills
 cp -R skills/huawei-insight-deck ~/.codex/skills/huawei-insight-deck
 cp -R skills/tech-research-deck ~/.codex/skills/tech-research-deck
 ```
