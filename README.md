@@ -10,10 +10,10 @@ A library of reusable Codex skills for industrial research, technology analysis,
 
 | Skill | Purpose | Best for | Main output |
 | --- | --- | --- | --- |
-| `tech-research-deck` | Structures a research problem, verifies evidence, decomposes architectures and technical routes, compares representative cases, and develops defensible trend judgments. | Technology landscapes, industrial value chains, route comparisons, system architecture, product or paper analysis, data and infrastructure implications, and forward-looking research. | A source-aware, slide-ready research narrative with architecture maps, route decompositions, same-field comparisons, case evidence, trend judgments, and page-level claims. |
-| `huawei-insight-deck` | Turns established judgments into consistent, editable, executive-readable pages using a restrained visual system, reusable layout components, and render QA. | Dense reading slides, executive one-pagers, comparison tables, route diagrams, evidence cards, page polishing, and final presentation production. | An editable 16:9 PowerPoint deck with consistent page structure, native elements, source notes, and visually inspected renders. |
+| `tech-research-deck` | Frames and structures technology research. | Architectures, routes, cases, and trends. | A source-aware, slide-ready research narrative. |
+| `huawei-insight-deck` | Turns established judgments into consistent pages. | Executive decks, one-pagers, and page production. | An editable 16:9 PowerPoint deck with render QA. |
 
-`tech-research-deck` owns the research question, evidence, architecture, routes, cases, and trends. `huawei-insight-deck` owns the conversion of an established argument into consistent, editable pages for executive reading. Each skill can be used on its own, or they can be chained when a task needs both research development and presentation production.
+`tech-research-deck` is responsible for the research question, evidence, architecture, routes, cases, and trends. `huawei-insight-deck` is responsible for turning an established argument into consistent, editable pages designed for executive reading. Each skill can be used on its own, or they can be chained when a task needs both research development and presentation production.
 
 ## Why This Repository Exists
 
@@ -36,7 +36,7 @@ source material
 
 - **Claim-first:** each page starts with the conclusion it must establish. Evidence, diagrams, and comparisons are selected to support that claim rather than accumulated without hierarchy.
 - **Traceability:** important facts, numbers, benchmark results, and company statements retain their source, date, object, and measurement context. Confirmed facts remain distinct from analyst judgment.
-- **Same-field comparison:** competing routes, products, cases, or scenarios are compared using the same dimensions so that differences are meaningful rather than rhetorical.
+- **Like-for-like comparison:** competing routes, products, cases, or scenarios are compared using the same dimensions so that differences are meaningful rather than rhetorical.
 - **Editable delivery:** final pages use native PowerPoint text, shapes, tables, and charts wherever practical. The deck remains usable after delivery instead of becoming a set of flattened images.
 
 ## Quick Start
@@ -47,7 +47,7 @@ Use the research skill when the question is still being defined or the evidence 
 $tech-research-deck
 ```
 
-Use the presentation skill when the argument already exists and needs to become a consistent, executive-readable deck or one-pager:
+Use the presentation skill when the argument already exists and needs to become a consistent deck or one-pager designed for executive reading:
 
 ```text
 $huawei-insight-deck
@@ -63,6 +63,18 @@ For an end-to-end assignment, start with `$tech-research-deck` to establish the 
 git clone https://github.com/hoilex0421-star/lex-ai-research-skills.git
 cd lex-ai-research-skills
 mkdir -p ~/.codex/skills
+```
+
+If `~/.codex/skills/huawei-insight-deck` or `~/.codex/skills/tech-research-deck` already exists, back up or remove the old installation before continuing. Run this non-destructive preflight check before choosing either option; it also detects broken symlinks and exits without changing them:
+
+```bash
+for skill in huawei-insight-deck tech-research-deck; do
+  target="$HOME/.codex/skills/$skill"
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    printf 'Installation conflict: %s already exists. Back it up or remove it first.\n' "$target" >&2
+    exit 1
+  fi
+done
 ```
 
 After completing the common setup, choose one of the following installation options.
@@ -152,7 +164,7 @@ Each skill is self-contained. Its `SKILL.md` defines when to use it and how the 
 - **Evidence traceability:** material facts and numbers preserve their source, date, scope, and measurement context; source notes remain connected to the claim they support.
 - **Consistent comparison dimensions:** routes, products, companies, and cases are evaluated using identical fields wherever a direct comparison is intended.
 - **Direct body copy:** body text avoids unnecessary quotation marks. Quotation marks are reserved for verbatim language, official terms, or wording that is itself under analysis.
-- **Standard conclusion label:** the top conclusion strip is labeled `洞察`, not `核心判断`.
+- **Standard conclusion label:** the top conclusion strip is labeled `洞察` (Insight), not `核心判断` (Core Judgment).
 - **Editable PowerPoint:** text, shapes, tables, and charts remain editable so the output can be reviewed and revised after delivery.
 - **Render QA:** every completed deck is rendered and visually inspected for overlap, clipping, alignment, hierarchy, image placement, and source-note readability.
 
