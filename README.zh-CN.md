@@ -1,7 +1,5 @@
 # Lex AI Research Skills
 
-**研究不是一份文档，而是一套系统。**
-
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 面向产业研究、技术分析、证据组织和高管沟通的可复用 Codex 技能库。
