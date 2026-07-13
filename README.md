@@ -57,6 +57,13 @@ For an end-to-end assignment, start with `$tech-research-deck` to establish the 
 
 ## Installation
 
+### Prerequisites
+
+- Codex with local skill discovery enabled.
+- Git for cloning and updating the library.
+- Python 3 and `python-pptx` when running the optional PowerPoint helper scripts and examples included with `huawei-insight-deck`.
+- LibreOffice and Poppler are optional but useful for local slide rendering and visual QA. Codex may also provide equivalent presentation tooling in its runtime.
+
 ### Common setup
 
 ```bash
@@ -156,7 +163,7 @@ lex-ai-research-skills/
         └── references/
 ```
 
-Each skill is self-contained. Its `SKILL.md` defines when to use it and how the workflow operates; supporting references hold detailed research or layout rules; scripts provide deterministic presentation helpers where production requires them.
+Each skill can be installed and invoked independently. Its `SKILL.md` defines when to use it and how the workflow operates; supporting references hold detailed research or layout rules; scripts provide deterministic presentation helpers where production requires them. The core instructions are stored with each skill, while optional production helpers use the prerequisites listed above.
 
 ## Quality Principles
 

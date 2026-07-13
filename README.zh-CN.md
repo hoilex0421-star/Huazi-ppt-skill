@@ -57,6 +57,13 @@ $huawei-insight-deck
 
 ## 安装
 
+### 环境要求
+
+- 支持本地技能发现的 Codex。
+- 用于克隆和更新技能库的 Git。
+- 运行 `huawei-insight-deck` 随附的可选 PowerPoint 辅助脚本与示例时，需要 Python 3 和 `python-pptx`。
+- LibreOffice 与 Poppler 为可选工具，可用于本地幻灯片渲染和视觉 QA；也可以使用 Codex 运行环境提供的同类演示工具。
+
 ### 公共准备
 
 ```bash
@@ -165,7 +172,7 @@ lex-ai-research-skills/
         └── references/
 ```
 
-每项技能都可以独立安装和使用。`SKILL.md` 定义适用条件与工作流程，`references` 保存研究或版式的详细规则，`scripts` 在演示制作需要时提供可重复执行的辅助能力。
+每项技能都可以独立安装和调用。`SKILL.md` 定义适用条件与工作流程，`references` 保存研究或版式的详细规则，`scripts` 在演示制作需要时提供可重复执行的辅助能力。核心说明均随技能保存，可选制作工具则使用上文列出的运行依赖。
 
 ## 质量原则
 

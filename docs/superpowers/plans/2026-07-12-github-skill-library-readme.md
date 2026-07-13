@@ -462,8 +462,21 @@ Expected: both README files contain the language switch and new clone URL.
 Run:
 
 ```bash
-rg -n "^## Case Gallery|assets/cases/embodied-data-industry" README.md
-rg -n "^## 案例展示|assets/cases/embodied-data-industry" README.zh-CN.md
+python3 - <<'PY'
+from pathlib import Path
+
+checks = [
+    ("README.md", "## Case Gallery"),
+    ("README.zh-CN.md", "## 案例展示"),
+]
+needle = "assets/cases/embodied-data-industry/"
+for filename, heading in checks:
+    text = Path(filename).read_text()
+    assert heading in text, f"{filename}: missing gallery heading"
+    before, gallery = text.split(heading, 1)
+    assert needle not in before, f"{filename}: image appears before gallery"
+    assert gallery.count(needle) == 4, f"{filename}: expected four gallery images"
+PY
 ```
 
 Expected: in each file the gallery heading appears before exactly four image references, and no image references appear before that heading.
@@ -473,25 +486,26 @@ Expected: in each file the gallery heading appears before exactly four image ref
 Run:
 
 ```bash
-rg -n "核心判断|Zara|张咋啦|inspired by|借鉴" README.md README.zh-CN.md && exit 1 || true
+! rg -n "Zara|张咋啦|inspired by|借鉴" README.md README.zh-CN.md
 rg -n "洞察" README.md README.zh-CN.md skills/tech-research-deck/SKILL.md
+rg -n 'not `核心判断`|不用 `核心判断`' README.md README.zh-CN.md
 ```
 
-Expected: the forbidden expressions are absent from both READMEs, and `洞察` appears in both READMEs and the skill definition.
+Expected: named inspiration references are absent; `洞察` appears in both READMEs and the skill definition; `核心判断` appears only where the documentation explains that it is not the page label.
 
 - [ ] **Step 5: Verify repository hygiene**
 
 Run:
 
 ```bash
-git diff --check
+git diff --check main...HEAD
 git status --short
 git ls-files .superpowers
 ```
 
 Expected:
 
-- `git diff --check` produces no output.
+- `git diff --check main...HEAD` produces no output.
 - Git status contains no unexpected files.
 - `git ls-files .superpowers` produces no output.
 
@@ -550,7 +564,19 @@ git remote -v
 
 Expected: both fetch and push URLs use `lex-ai-research-skills.git`.
 
-- [ ] **Step 4: Push all local commits**
+- [ ] **Step 4: Fast-forward the completed feature branch into local `main`**
+
+Run:
+
+```bash
+git status --short
+git switch main
+git merge --ff-only feat/skill-library-readme
+```
+
+Expected: the worktree is clean before switching, and local `main` fast-forwards to the reviewed feature branch without a merge commit.
+
+- [ ] **Step 5: Push the updated default branch**
 
 Run:
 
@@ -560,7 +586,7 @@ git push -u origin main
 
 Expected: the local `main` branch is synchronized with `origin/main`.
 
-- [ ] **Step 5: Verify the renamed repository**
+- [ ] **Step 6: Verify the renamed repository**
 
 Run:
 
@@ -578,7 +604,7 @@ Expected:
 - Git status is clean.
 - Recent commits include the design spec, structure migration, gallery, and both README commits.
 
-- [ ] **Step 6: Verify a fresh clone**
+- [ ] **Step 7: Verify a fresh clone**
 
 Run:
 
@@ -593,4 +619,3 @@ test "$(find /tmp/lex-ai-research-skills-verify/assets/cases/embodied-data-indus
 ```
 
 Expected: the fresh clone contains both READMEs, both skills, and all four gallery images.
-
