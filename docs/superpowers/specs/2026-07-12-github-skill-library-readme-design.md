@@ -207,7 +207,7 @@ The normal README body may describe capabilities and outputs in text, but it mus
 
 The initial gallery features:
 
-**Embodied Data Industry Research: From Data Factories to Physical AI Infrastructure**  
+**Embodied Data Industry Research: From Data Factories to Physical AI Infrastructure**<br>
 **具身数据产业研究：从数据工厂到物理 AI 基础设施**
 
 The gallery uses four selected slides from:
@@ -316,4 +316,3 @@ The implementation phase will:
 - The renamed remote repository loads successfully.
 - The default GitHub README renders without broken images or broken language links.
 - A fresh clone exposes both skill directories in the documented locations.
-
