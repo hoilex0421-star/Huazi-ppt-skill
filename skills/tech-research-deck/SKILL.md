@@ -116,6 +116,19 @@ For a short one-page explanation, use only:
   `具身数据已成为独立赛道，但规模化供给尚未等于可持续盈利`.
 - Label the top-of-page conclusion or takeaway strip `洞察`, not `核心判断`.
 
+## Visual Encoding Rules
+
+- Treat `$huawei-insight-deck` as the visual source of truth and enforce its
+  hard ceiling of three non-neutral theme colors on every slide.
+- Default to red for the primary claim and judgement, navy for supporting
+  structure or publicly verified evidence, and grayscale for neutral analysis.
+- Use green or amber only as the third color for one stable semantic role, such
+  as a route distinction, positive status, risk, or pending verification.
+- Do not assign different hues to each route, person, company, stage, module, or
+  card. Differentiate peers with position, labels, line style, fill tint, or
+  typography before introducing another color.
+- Run the theme-color audit and render every slide before delivery.
+
 ## References
 
 - Read `references/technical-reading-deck-patterns.md` for detailed page patterns,
