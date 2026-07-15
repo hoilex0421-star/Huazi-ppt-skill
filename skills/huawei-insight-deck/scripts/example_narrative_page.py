@@ -17,8 +17,8 @@ from deck_helpers import *
 def slide_timeline(s):
     title_band(s, "空间智能 / 世界模型 2024 起加速：", "学术界与产业界并行发布，落地节奏明显前移")
 
-    # category legend (muted blue/green chips — NOT for emphasis)
-    ex = tag_chip(s, 0.5, 1.10, "场景生成", fill=BLUE)
+    # Three-color budget: RED + NAVY + GREEN. Category colors are not emphasis.
+    ex = tag_chip(s, 0.5, 1.10, "场景生成", fill=NAVY)
     tag_chip(s, ex + 0.14, 1.10, "场景理解", fill=GREEN)
     note(s, 0.5, 1.44, 8.0, "注：示意时间线，仅列代表性事件；红字为重点产品/模型。")
 
@@ -32,7 +32,7 @@ def slide_timeline(s):
     ]
     for x, head, body in acad:
         event_card(s, x, AY, 2.75, 1.30, head, body, img=True)
-    tag_chip(s, 12.45, AY + 0.45, "学术界", fill=BLUE, w=0.78)
+    tag_chip(s, 12.45, AY + 0.45, "学术界", fill=NAVY, w=0.78)
 
     # time axis (middle) — returns tick centers
     time_axis(s, 0.55, 3.62, 12.68, ["2024.6", "2024.9", "2024.12", "2025.3"], color=NAVY)
@@ -66,11 +66,11 @@ def slide_framework(s):
     # left flow: 输入 -> 三维重建 -> 渲染输出
     fy = 1.80
     tag_chip(s, 0.55, fy, "输入", fill=NAVY, w=0.70)
-    stage_box(s, 1.40, fy - 0.04, 1.55, 0.62, "图像 / 点云", accent=BLUE)
+    stage_box(s, 1.40, fy - 0.04, 1.55, 0.62, "图像 / 点云", accent=NAVY)
     arrow(s, 3.02, fy + 0.12, 0.34, 0.16, color=RED)
-    stage_box(s, 3.42, fy - 0.04, 1.55, 0.62, "3DGS / Mesh", "可编辑、物理真实", accent=BLUE)
+    stage_box(s, 3.42, fy - 0.04, 1.55, 0.62, "3DGS / Mesh", "可编辑、物理真实", accent=NAVY)
     arrow(s, 5.04, fy + 0.12, 0.34, 0.16, color=RED)
-    stage_box(s, 5.42, fy - 0.04, 1.25, 0.62, "渲染图像", accent=BLUE)
+    stage_box(s, 5.42, fy - 0.04, 1.25, 0.62, "渲染图像", accent=NAVY)
 
     # right flow: 输入 -> 自回归世界模型 -> 预测帧
     tag_chip(s, 7.05, fy, "输入", fill=NAVY, w=0.70)
@@ -104,7 +104,7 @@ def slide_framework(s):
 
 if __name__ == '__main__':
     prs = newdeck()
-    slide_timeline(blank(prs))
-    slide_framework(blank(prs))
+    timeline = blank(prs); slide_timeline(timeline); assert_theme_color_budget(timeline)
+    framework = blank(prs); slide_framework(framework); assert_theme_color_budget(framework)
     out = os.path.join(os.path.dirname(__file__), 'example_narrative_page.pptx')
     prs.save(out); print('saved', out)

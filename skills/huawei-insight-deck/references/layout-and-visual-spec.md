@@ -6,6 +6,7 @@ encode these; this file is the reference when you need to deviate or debug.
 
 ## Table of contents
 - Palette
+- Consulting color discipline
 - Grid / safe margins
 - Part-by-part coordinates
 - Chart construction (stacked bar, trend line)
@@ -30,6 +31,60 @@ encode these; this file is the reference when you need to deviate or debug.
 
 Font: **微软雅黑** on latin + ea + cs runs (the helper `_setfont` does all three;
 setting only `font.name` leaves CJK glyphs in a fallback face).
+
+## Consulting color discipline
+
+Public McKinsey and BCG materials use different brand colors but share the same
+discipline: white space and grayscale carry most of the page; one brand hue
+organizes hierarchy; another hue appears sparingly for comparison or status.
+McKinsey describes its identity as deep blue on white with high contrast and a
+reworked data-visualization system. BCG's 2025 public AI reports are predominantly
+deep/bright green, with warm neutral comparison marks and rare semantic alerts.
+Use these as visual references, not as brand templates to clone.
+
+### Theme-color budget
+
+- A slide may use at most **three non-neutral theme colors**.
+- Default composition: **one dominant + one supporting**. A third color is
+  allowed only for a stable semantic role such as risk/status or a genuine route
+  distinction.
+- White, black, grayscale text/borders, and light tints derived from an active
+  theme color do not add a new theme color.
+- Photographs and screenshots are excluded from the count, but their surrounding
+  frames, captions, overlays, and chart marks are included.
+- Pick one palette logic for the slide/deck. Do not mix McKinsey-blue and BCG-green
+  systems decoratively.
+- A shade may replace another shade in the same role; do not use both just to add
+  visual variety.
+
+### Recommended restrained-red recipe
+
+This skill's default remains Huawei-compatible while adopting consulting-style
+restraint:
+
+| Role | Token | Hex | Rule |
+|---|---|---|---|
+| Dominant claim/emphasis | RED | C7000B | titles, conclusions, key number |
+| Supporting structure | NAVY | 1F3864 | axes, one route/category family |
+| Optional semantic exception | GREEN | 4F8A3D | status or second route only when meaning requires it |
+
+`RED + NAVY` is the default. Add `GREEN` only when a two-route/status distinction
+would otherwise be ambiguous. `BLUE` may substitute for `NAVY` on a blue-forward
+page, but **BLUE and NAVY must not both appear on that page**.
+
+For a user-requested non-red consulting variant, use the same role structure:
+
+- McKinsey-inspired: deep navy + clear blue; optional warm signal color.
+- BCG-inspired: deep green + bright green; optional warm neutral comparison color.
+
+Do not present these as official brand palettes. The reusable rule is the role
+discipline and the three-color ceiling.
+
+### Color audit
+
+Call `assert_theme_color_budget(slide)` after constructing each slide. The helper
+ignores the template's neutral colors, pale derived fills, and pictures, then
+raises an error listing the remaining theme colors if the count exceeds three.
 
 ## Grid / safe margins
 
@@ -97,13 +152,15 @@ Same title band (y 0.30, rule at 0.96) and a `conclusion_band` near the bottom
 ### Secondary category-chip palette (Family B only)
 | Token | Hex | Use |
 |---|---|---|
-| BLUE | 2E5C9E | category chip A (e.g. 场景生成 / 显式) |
-| GREEN | 4F8A3D | category chip B (e.g. 场景理解 / 隐式) |
-| NAVY | 1F3864 | category chip C / the time-axis band fill |
+| NAVY | 1F3864 | default supporting category / time-axis band |
+| GREEN | 4F8A3D | optional second route or semantic status |
+| BLUE | 2E5C9E | substitute for NAVY on a blue-forward page; never use both |
 | BLUEF | EAF1FA | very light blue panel fill |
 | GREENF | EEF5E9 | very light green panel fill |
 
-Red stays the only colour for conclusions/emphasis; these are muted *labels* only.
+This table is an inventory, not permission to use every swatch together. Red stays
+the only color for conclusions/emphasis; category colors are muted labels only.
+The normal Family B page is `RED + NAVY`, optionally `+ GREEN`.
 
 ### Helper geometry
 - **`tag_chip(x, y, label, fill, ...)`** — auto-sizes width via `_est_w` (CJK≈1.02·pt,
@@ -136,6 +193,37 @@ Red stays the only colour for conclusions/emphasis; these are muted *labels* onl
   bottom line (the reference deck ends almost every page this way).
 - **`note(x, y, w, txt)`** — small gray 注/caption line.
 
+### Route evolution three-panel geometry
+Use for "当前方案 → 方向一 → 方向二" pages.
+
+- Keep the claim band at y≈1.18 and start the three panels no earlier than y≈2.2,
+  so the page has a clear breathing gap between title and route map.
+- Three large dashed panels usually work at:
+  - 当前方案: x≈0.35, y≈2.28, w≈3.95, h≈4.10
+  - 方向一: x≈5.05, y≈2.28, w≈3.75, h≈4.10
+  - 方向二: x≈8.95, y≈2.28, w≈4.10, h≈4.10
+- If the middle/right panels need equal strategic weight, keep their headers aligned
+  and use only one red "演进" arrow from the current panel toward the future panels.
+- Put short representative notes at each panel's bottom (e.g. "代表案例 A").
+  Do not add a second comparison table on the same slide unless body text remains
+  comfortably above ~7pt.
+
+### Data-flywheel case-page geometry
+Use for "糖水 demo 数据 vs 牛奶真实数据" pages.
+
+- Top contrast panels: left x≈0.35, w≈4.6; right x≈5.45, w≈7.55; y≈1.65, h≈2.40.
+  The right panel can carry 5 small noise boxes plus a horizontal flywheel strip.
+- Middle claim strip: x≈0.35, y≈4.20, w≈12.65, h≈0.34. State the four dimensions
+  inline instead of using a separate dimension-card row when space is tight.
+- Bottom case cards: three equal cards at x≈0.45 / 4.85 / 9.25, y≈4.65, w≈3.75,
+  h≈2.00-2.20. Each card hierarchy is:
+  1) gray header with company name,
+  2) three same-field rows (落地方式 / 采集数据 / 飞轮闭环),
+  3) image band inside the card.
+- Images must sit inside card boundaries and align to a shared top or bottom.
+  If source images have different aspect ratios, preserve aspect ratio and center
+  them; do not stretch just to make widths identical.
+
 ### Family B pitfalls
 - **Arrow overlapping a box.** Always leave a real gap; an arrow drawn over a box edge
   looks like a bug. Compute box right-edge + small gap for the arrow x.
@@ -144,4 +232,12 @@ Red stays the only colour for conclusions/emphasis; these are muted *labels* onl
 - **Table text truncation.** If a cell wraps to 2 lines, raise `row_h`; don't shrink the
   font below ~7.5pt. Keep the field column narrow and the compared columns wide.
 - **Too many hues.** Resist coloring stage boxes by hue. Use the gray box + a single
-  `accent` strip, and let red carry the conclusion.
+  `accent` strip, and let red carry the conclusion. Run
+  `assert_theme_color_budget(slide)`; more than three theme colors is a delivery
+  blocker, not a stylistic preference.
+- **One-page over-compression.** If a page needs both route mechanics and case evidence,
+  split it. The Huawei style tolerates density, but not when mechanism, criteria, and
+  screenshots fight for the same vertical band.
+- **Floating screenshots.** Case-card images must be visually owned by the card. If a
+  screenshot crosses or sits below the card border, enlarge/reposition the card before
+  delivery.

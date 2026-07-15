@@ -19,7 +19,7 @@ from pptx import Presentation
 from pptx.util import Emu, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
-from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.shapes import MSO_SHAPE, MSO_SHAPE_TYPE
 from pptx.oxml.ns import qn
 
 EMU = 914400
@@ -33,14 +33,20 @@ RED3  = C('EAB3B5')   # light red (家庭 / 第三序列)
 DARK  = C('1A1A1A'); MID = C('595959'); MUTE = C('8C8C8C'); WHITE = C('FFFFFF')
 GRID  = C('D9D9D9'); GF = C('F6F6F6'); PINK = C('FBECED'); GRAYH = C('6E6E6E'); LINEGRY = C('E2E2E2')
 # --- secondary CATEGORY-chip palette (narrative pages only) ---
-# Red stays the dominant accent + the ONLY colour used for conclusions/重点.
-# Blue/green/navy are MUTED category tags (场景生成/场景理解, 输入/输出, 显式/隐式) — never for emphasis.
-BLUE  = C('2E5C9E')   # category chip A
-GREEN = C('4F8A3D')   # category chip B
-NAVY  = C('1F3864')   # category chip C / axis fill
+# Hard rule: max three theme colors per slide. The normal recipe is RED + NAVY,
+# optionally + GREEN. BLUE substitutes for NAVY; never use BLUE and NAVY together.
+BLUE  = C('2E5C9E')   # alternate blue-forward supporting color
+GREEN = C('4F8A3D')   # optional second route / semantic status
+NAVY  = C('1F3864')   # default supporting category / axis fill
 BLUEF = C('EAF1FA')   # very light blue panel fill
 GREENF= C('EEF5E9')   # very light green panel fill
 FONT  = "微软雅黑"
+
+# Neutral colors and pale derived fills do not consume the theme-color budget.
+NON_THEME_HEX = {
+    '1A1A1A', '595959', '8C8C8C', '6E6E6E', 'D9D9D9', 'E2E2E2',
+    'F2F2F2', 'F6F6F6', 'FFFFFF', 'FBECED', 'F2D9DC', 'EAF1FA', 'EEF5E9',
+}
 
 def newdeck():
     prs = Presentation(); prs.slide_width = IN(13.333); prs.slide_height = IN(7.5); return prs
@@ -49,6 +55,75 @@ def blank(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     for ph in list(s.placeholders): ph._element.getparent().remove(ph._element)
     return s
+
+def _rgb_hex(color_format):
+    try:
+        rgb = color_format.rgb
+    except (AttributeError, TypeError, ValueError):
+        return None
+    return str(rgb).upper() if rgb is not None else None
+
+def _slide_theme_colors(slide):
+    """Collect explicit RGB colors from shapes and text, excluding pictures."""
+    colors = set()
+
+    def add_color(color_format):
+        value = _rgb_hex(color_format)
+        if value:
+            colors.add(value)
+
+    def scan_text_frame(tf):
+        for paragraph in tf.paragraphs:
+            for run in paragraph.runs:
+                add_color(run.font.color)
+
+    def scan_shapes(shapes):
+        for shape in shapes:
+            if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+                continue
+            if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
+                scan_shapes(shape.shapes)
+                continue
+            try:
+                if shape.fill.type is not None:
+                    add_color(shape.fill.fore_color)
+            except (AttributeError, TypeError, ValueError):
+                pass
+            try:
+                add_color(shape.line.color)
+            except (AttributeError, TypeError, ValueError):
+                pass
+            if getattr(shape, 'has_text_frame', False):
+                scan_text_frame(shape.text_frame)
+            if getattr(shape, 'has_table', False):
+                for row in shape.table.rows:
+                    for cell in row.cells:
+                        try:
+                            if cell.fill.type is not None:
+                                add_color(cell.fill.fore_color)
+                        except (AttributeError, TypeError, ValueError):
+                            pass
+                        scan_text_frame(cell.text_frame)
+
+    scan_shapes(slide.shapes)
+    return colors
+
+def theme_color_audit(slide, ignored_hex=None):
+    """Return sorted non-neutral RGB colors used by a slide."""
+    ignored = NON_THEME_HEX if ignored_hex is None else {
+        str(value).replace('#', '').upper() for value in ignored_hex
+    }
+    return sorted(_slide_theme_colors(slide) - ignored)
+
+def assert_theme_color_budget(slide, max_colors=3, ignored_hex=None):
+    """Raise when a slide exceeds the consulting-style theme-color budget."""
+    colors = theme_color_audit(slide, ignored_hex=ignored_hex)
+    if len(colors) > max_colors:
+        raise ValueError(
+            f"Slide uses {len(colors)} theme colors ({', '.join(colors)}); "
+            f"maximum is {max_colors}."
+        )
+    return colors
 
 def _setfont(r, size, color, bold):
     r.font.size = Pt(size); r.font.bold = bold; r.font.color.rgb = color; r.font.name = FONT
@@ -102,6 +177,64 @@ def dot(s, cx, cy, d, color):
     o = s.shapes.add_shape(MSO_SHAPE.OVAL, IN(cx - d / 2), IN(cy - d / 2), IN(d), IN(d))
     o.fill.solid(); o.fill.fore_color.rgb = color; o.line.fill.background(); o.shadow.inherit = False
     return o
+
+def dashed_panel(s, x, y, w, h, title, subtitle=None, tag=None, fill=WHITE, dash='dash'):
+    """Large dashed rounded panel for route maps and data-contrast pages.
+    Use for strategic groups such as 当前 / 方向一 / 方向二 or Demo 数据 / 真实数据."""
+    shp = rect(s, x, y, w, h, fill, line=LINEGRY, lw=1.0, rounded=True, rad=0.06)
+    ln = shp.line._get_or_add_ln()
+    ln.append(ln.makeelement(qn('a:prstDash'), {'val': dash}))
+    tx = x + 0.14
+    if tag:
+        text(s, x + 0.12, y + 0.10, 0.36, 0.24, [[(tag, 8.2, RED, True)]],
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        tx = x + 0.52
+    text(s, tx, y + 0.09, w - (tx - x) - 0.16, 0.26,
+         [[(title, 8.8, RED, True)]], anchor=MSO_ANCHOR.MIDDLE)
+    if subtitle:
+        text(s, x + 0.16, y + h - 0.36, w - 0.32, 0.26,
+             [[(subtitle, 6.8, MID, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    return shp
+
+def route_node(s, x, y, w, h, title, body=None, red=False, fill=WHITE, dashed=False):
+    """Small node inside a route panel. Keep text short: title + at most one line."""
+    shp = rect(s, x, y, w, h, fill, line=RED if red else LINEGRY, lw=1.0, rounded=True, rad=0.05)
+    if dashed:
+        ln = shp.line._get_or_add_ln()
+        ln.append(ln.makeelement(qn('a:prstDash'), {'val': 'dash'}))
+    text(s, x + 0.05, y + 0.05, w - 0.10, 0.22,
+         [[(title, 8.0, RED if red else DARK, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    if body:
+        text(s, x + 0.08, y + 0.30, w - 0.16, h - 0.34,
+             [[(body, 6.4, MID, False)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.TOP, ls=1.05)
+    return shp
+
+def image_case_card(s, x, y, w, h, name, rows, image_path=None, image_frame=None,
+                    header_fill=C('D9D9D9'), focus=False):
+    """Bottom case card for deployment/data-flywheel pages.
+    rows = [(label, value), ...] and should use identical labels across cards
+    (e.g. 落地方式 / 采集数据 / 飞轮闭环). The image is owned by the card and stays
+    inside the boundary."""
+    fill = PINK if focus else WHITE
+    line = RED if focus else LINEGRY
+    rect(s, x, y, w, h, fill, line=line, lw=1.0, rounded=True, rad=0.06)
+    rect(s, x, y, w, 0.30, header_fill if not focus else RED, line=line, lw=0.8, rounded=True, rad=0.06)
+    text(s, x + 0.10, y + 0.03, w - 0.20, 0.24,
+         [[(name, 8.8, WHITE if focus else RED, True)]],
+         align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    row_y = y + 0.50
+    for label, value in rows:
+        text(s, x + 0.18, row_y, w - 0.36, 0.18,
+             [[(label + "  ", 6.7, RED, True), (value, 6.7, DARK, False)]],
+             anchor=MSO_ANCHOR.MIDDLE)
+        row_y += 0.20
+    ix, iy, iw, ih = image_frame if image_frame else (x + 0.20, y + 1.05, w - 0.40, h - 1.16)
+    if image_path:
+        pic = s.shapes.add_picture(image_path, IN(ix), IN(iy), width=IN(iw), height=IN(ih))
+        pic.shadow.inherit = False
+        return pic
+    image_ph(s, ix, iy, iw, ih)
+    return None
 
 # ---------------- the 5 structural parts ----------------
 
@@ -168,8 +301,10 @@ def stacked_bar(s, region, bars, series_colors, ymax, title=None):
 # ============================================================================
 # Technical-narrative helpers (timeline / framework-flow / tech-path / table /
 # case pages). These model the second page family this skill covers. Red is
-# still the dominant accent and the ONLY colour for conclusions; BLUE/GREEN/NAVY
-# are muted CATEGORY chips. Every page still ends with a conclusion_band.
+# still the dominant accent and the ONLY colour for conclusions. NAVY is the
+# default supporting category color; GREEN is an optional semantic third.
+# BLUE substitutes for NAVY and must not join it. Every page still ends with a
+# conclusion_band.
 # ============================================================================
 
 def _est_w(t, size):

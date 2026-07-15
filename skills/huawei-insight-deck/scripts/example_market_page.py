@@ -48,7 +48,7 @@ def build(s):
     RX, RW = 6.66, 6.16
     card(s, RX, 2.10, RW, 1.92, "工业 · 制造+物流",
          [[("近期主战场", 7.4, WHITE, True)], [("2030 ", 7, WHITE, False), ("15–45 万", 7.4, WHITE, True)], [("2035 ", 7, WHITE, False), ("50–90 万", 7.4, WHITE, True)]],
-         RED, [("客户", "车厂 / 3C 代工 · 3PL 物流 / 电商仓"), ("买点", "顶替工位 · 降人力 · ROI 可算"), ("实例", "优必选 / 星动纪元 / 原力灵机 / 银河通用"), ("定位", "订单最实、初创最集中")])
+         RED, [("客户", "车厂 / 3C 代工 · 3PL 物流 / 电商仓"), ("买点", "顶替工位 · 降人力 · ROI 可算"), ("实例", "代表公司 A / B / C"), ("定位", "订单最实、初创最集中")])
     card(s, RX, 4.10, RW, 1.42, "商业 · 商用服务",
          [[("正起步", 7.4, WHITE, True)], [("2030 ", 7, WHITE, False), ("10–35 万", 7.4, WHITE, True)], [("2035 ", 7, WHITE, False), ("35–80 万", 7.4, WHITE, True)]],
          RED2, [("客户", "零售连锁 / 商超 · 酒店 · 展馆导览 · 安防"), ("买点", "补货/导购 · 送物 · 巡检"), ("进展", "多为试点 / demo"), ("定位", "场景散、单点验证为主")])
@@ -60,6 +60,6 @@ def build(s):
     s.notes_slide.notes_text_frame.text = "在备注里写全每个数字的一手出处+链接（可回溯）。示例略。"
 
 if __name__ == '__main__':
-    prs = newdeck(); build(blank(prs))
+    prs = newdeck(); slide = blank(prs); build(slide); assert_theme_color_budget(slide)
     out = os.path.join(os.path.dirname(__file__), 'example_market_page.pptx')
     prs.save(out); print('saved', out)
